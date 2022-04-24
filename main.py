@@ -35,6 +35,54 @@ def main():
         return jsonify(response_json)
 
 
+    @app.route('/movie/<int:year_start>/to/<int:year_end>')
+    def get_movie_year(year_start, year_end):
+        query = f"""
+            SELECT title,release_year
+            FROM netflix
+            WHERE release_year BETWEEN '{year_start}' AND '{year_end}'
+            ORDER BY release_year DESC
+            LIMIT 100
+        """
+        response = get_db(query)
+        response_json = []
+        for movie in response:
+            response_json.append({
+                'title': movie[0],
+                'release_year': movie[1]
+            })
+        return jsonify(response_json)
+
+
+    @app.route('/rating/<group>')
+    def get_movie_rating(group):
+        levels = {
+            'children': ['G'],
+            'family': ['G', 'PG', 'PG-13'],
+            'adult': ['R', 'NC-17']
+        }
+        if group in levels:
+            level = '\", \"'.join(levels[group])
+            level = f'\"{level}\"'
+        else:
+            return jsonify([])
+
+        query = f"""
+            SELECT title, rating, description
+            FROM netflix
+            WHERE rating IN ({level})
+        """
+
+        response = get_db(query)
+        response_json = []
+        for movie in response:
+            response_json.append({
+                'title': movie[0],
+                'rating': movie[1],
+                'description': movie[2],
+            })
+        return jsonify(response_json)
+
 
     app.run(debug=True)
 
