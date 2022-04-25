@@ -83,8 +83,47 @@ def main():
             })
         return jsonify(response_json)
 
+    @app.route('/genre/<genre>')
+    def get_genre(genre):
+        query = f"""
+                SELECT title
+                FROM netflix
+                WHERE listed_in LIKE '%{genre}%'
+                ORDER BY release_year DESC
+                LIMIT 10
+            """
+        response = get_db(query)
+        response_json = []
+        for genre in response:
+            response_json.append({
+                'title': genre[0]
+            })
+        return jsonify(response_json)
 
-    app.run(debug=True)
+
+    def get_cast(name1='Rose McIver', name2='Ben Lamb'):
+        query = f"""
+            SELECT `cast`
+            FROM netflix 
+            WHERE `cast` LIKE '%{name1}%' 
+            AND `cast` LIKE '%{name2}%'
+        """
+        response = get_db(query)
+        actors = []
+        for cast in response:
+            actors.extend(cast[0].split(', '))
+        result = []
+        for a in actors:
+            if a not in [name1, name2]:
+                if actors.count(a) > 2:
+                    result.append(a)
+        result = set(result)
+        print(result)
+
+    #get_cast()
+
+
+    #app.run(debug=True)
 
 
 if __name__ == "__main__":
