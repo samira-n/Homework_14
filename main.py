@@ -123,6 +123,27 @@ def main():
     #get_cast()
 
 
+    def movie_type(type_film, release_year, genre):
+        query = f"""
+            SELECT title, description, `type`
+            FROM netflix
+            WHERE `type` = '{type_film}'
+            AND release_year = {release_year}
+            AND listed_in LIKE '%{genre}%'
+        """
+        response = get_db(query)
+        response_json = []
+        for movie in response:
+            response_json.append({
+                'title': movie[0],
+                'description': movie[1],
+                'type': movie[2]
+            })
+        return response_json
+    print(movie_type(type_film='TV Show', release_year=2020, genre='TV Dramas'))
+
+
+
     #app.run(debug=True)
 
 
