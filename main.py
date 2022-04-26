@@ -23,19 +23,26 @@ def main():
             ORDER BY release_year DESC
             LIMIT 1
         """
-        response = get_db(query)[0]
-        response_json = {
-            'title': response[0],
-            'country': response[1],
-            'release_year': response[2],
-            'genre': response[3],
-            'description': response[4],
-            'type': response[5]
-        }
+        response = get_db(query)
+        response_json = []
+        for movie in response:
+            if movie:
+                response_json.append({
+                    'title': movie[0],
+                    'country': movie[1],
+                    'release_year': movie[2],
+                    'genre': movie[3],
+                    'description': movie[4],
+                    'type': movie[5]
+                })
+            else:
+                return jsonify([])
+
         return jsonify(response_json)
 
 
-    @app.route('/movie/<int:year_start>/to/<int:year_end>')
+
+    @app.route('/year/<int:year_start>/to/<int:year_end>')
     def get_movie_year(year_start, year_end):
         query = f"""
             SELECT title,release_year
@@ -47,10 +54,14 @@ def main():
         response = get_db(query)
         response_json = []
         for movie in response:
-            response_json.append({
-                'title': movie[0],
-                'release_year': movie[1]
-            })
+            if movie:
+                response_json.append({
+                    'title': movie[0],
+                    'release_year': movie[1]
+                })
+            else:
+                return jsonify([])
+
         return jsonify(response_json)
 
 
@@ -76,11 +87,14 @@ def main():
         response = get_db(query)
         response_json = []
         for movie in response:
-            response_json.append({
-                'title': movie[0],
-                'rating': movie[1],
-                'description': movie[2],
-            })
+            if movie:
+                response_json.append({
+                    'title': movie[0],
+                    'rating': movie[1],
+                    'description': movie[2],
+                })
+            else:
+                return jsonify([])
         return jsonify(response_json)
 
     @app.route('/genre/<genre>')
@@ -95,9 +109,12 @@ def main():
         response = get_db(query)
         response_json = []
         for genre in response:
-            response_json.append({
-                'title': genre[0]
-            })
+            if genre:
+                response_json.append({
+                    'title': genre[0]
+                })
+            else:
+                return jsonify([])
         return jsonify(response_json)
 
 
@@ -140,11 +157,11 @@ def main():
                 'type': movie[2]
             })
         return response_json
-    print(movie_type(type_film='TV Show', release_year=2020, genre='TV Dramas'))
+    #print(movie_type(type_film='TV Show', release_year=2020, genre='TV Dramas'))
 
 
 
-    #app.run(debug=True)
+    app.run(debug=True)
 
 
 if __name__ == "__main__":
